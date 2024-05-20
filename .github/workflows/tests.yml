@@ -34,7 +34,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                python-version: [3.8.16, 3.9.16, 3.10.11]
+                python-version: [3.11.9]
         steps:
             - uses: actions/checkout@v2
             - name: Set up Python ${{ matrix.python-version }}
@@ -55,7 +55,7 @@ jobs:
         runs-on: macos-latest
         strategy:
             matrix:
-                python-version: [3.8.16, 3.9.16, 3.10.11]
+                python-version: [3.11]
         steps:
             - uses: actions/checkout@v2
             - name: Set up Python ${{ matrix.python-version }}
