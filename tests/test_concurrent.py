@@ -135,8 +135,15 @@ async def test_heavy_load(gql, sync_resolvers, requests_number):
         receive_waitlist += [client.transport.receive(), client.transport.receive()]
 
     start_ts = time.monotonic()
-    await asyncio.wait(send_waitlist)
-    responses, _ = await asyncio.wait(receive_waitlist)
+    async with asyncio.TaskGroup() as tg:
+        for waitlist in send_waitlist:
+            tg.create_task(waitlist)
+
+    responses = []
+    async with asyncio.TaskGroup() as tg:
+        for waitlist in receive_waitlist:
+            responses.append(tg.create_task(waitlist))
+
     time_spent = time.monotonic() - start_ts
     print(
         f"RPS: { (requests_number / time_spent) if time_spent != 0 else '∞'}"
@@ -393,18 +400,12 @@ async def test_subscribe_and_many_unsubscribes(
             break
 
     print("Let's run all the tasks concurrently.")
-    _, pending = await asyncio.wait(awaitables, timeout=wait_timeout)
+    pending = []
 
-    # Check that the server withstood the flow of subscribe-unsubscribe
-    # messages and successfully responded to all messages.
-    if pending:
-        for task in pending:
-            task.cancel()
-        await asyncio.wait(pending)
-        assert False, (
-            "Time limit has been reached!"
-            " Subscribe-unsubscribe tasks can not be completed!"
-        )
+    async with asyncio.timeout(wait_timeout):
+        async with asyncio.TaskGroup() as tg:
+            for awaitable in awaitables:
+                pending.append(tg.create_task(awaitable))
 
     assert not op_ids, "Not all subscriptions have been stopped!"
 
