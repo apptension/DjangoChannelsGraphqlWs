@@ -47,17 +47,18 @@ packages = [
 # Production dependencies.
 # Version syntax: https://python-poetry.org/docs/dependency-specification/
 [tool.poetry.dependencies]
-python = "^3.8.0"
+python = "^3.11.1"
 aiohttp = "^3"
 asgiref = "^3"
 channels = "^4"
-Django = "^4"
+Django = "^5.0.6"
 graphene = "^3"
 graphql-core = "3.2.3" # Carefully test after upgrade, since we path private internals.
 msgpack = "^1"
 
 # Development dependencies.
 # Version syntax: https://python-poetry.org/docs/dependency-specification/
+pytest = "^8.2.0"
 [tool.poetry.group.dev.dependencies]
 black = { version = "*" }
 channels = {version = "^4", extras = ["daphne"]}
@@ -83,7 +84,7 @@ tox = "*"
 # Black - the uncompromising code formatter.
 # https://black.readthedocs.io/en/stable/index.html
 [tool.black]
-target-version = ['py38', 'py39', 'py310']
+target-version = ['py311']
 
 # ---------------------------------------------------------------- ISORT
 # Isort configuration.
@@ -166,7 +167,7 @@ omit = ["**/test_*.py"]
 legacy_tox_ini = """
 [tox]
 isolated_build = true
-envlist = py38,py39,py310
+envlist = py311
 [testenv]
 allowlist_externals = poetry
 commands_pre = poetry install -v
@@ -193,7 +194,8 @@ warn_unused_configs = true
 
 # pytest-pythonpath:
 # Set up paths to import Python modules from.
-python_paths = ". example"
+#python_paths = ". example"
+pythonpaths = ". example"
 # pytest-django:
 # NOTE: This influence to both Pytest and to `pylint_django`, cause
 # in fact, it simply sets `DJANGO_SETTINGS_MODULE` environment variable.
